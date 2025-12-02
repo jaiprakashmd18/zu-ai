@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Zu | AI Interface</title>
+    <title>Zu | Dual-Core AI Interface</title>
     
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -175,6 +175,19 @@
             background: rgba(255, 255, 255, 0.1);
             border-left: 2px solid var(--neon-primary);
         }
+        
+        /* Mobile Sidebar Toggle Logic */
+        @media (max-width: 768px) {
+            #sidebar {
+                position: absolute;
+                height: 100%;
+                z-index: 50;
+                transform: translateX(-100%);
+            }
+            #sidebar.open {
+                transform: translateX(0);
+            }
+        }
     </style>
 </head>
 <body>
@@ -186,17 +199,23 @@
     <div id="ui-layer">
         
         <!-- Sidebar -->
-        <aside class="glass-sidebar w-72 hidden md:flex flex-col transition-all duration-300 z-20 h-full" id="sidebar">
+        <aside class="glass-sidebar w-72 flex flex-col transition-transform duration-300 md:translate-x-0" id="sidebar">
             <!-- Header -->
-            <div class="p-5 flex items-center gap-3 border-b border-white/10 shrink-0">
-                <div class="w-8 h-8 rounded bg-gradient-to-br from-cyan-500 to-blue-600 flex items-center justify-center text-white font-bold shadow-[0_0_15px_rgba(6,182,212,0.5)]">
-                    Z
+            <div class="p-5 flex items-center justify-between border-b border-white/10 shrink-0">
+                <div class="flex items-center gap-3">
+                    <div class="w-8 h-8 rounded bg-gradient-to-br from-cyan-500 to-blue-600 flex items-center justify-center text-white font-bold shadow-[0_0_15px_rgba(6,182,212,0.5)]">
+                        Z
+                    </div>
+                    <span class="text-2xl logo-text">Zu</span>
                 </div>
-                <span class="text-2xl logo-text">Zu</span>
+                <!-- Mobile Close Button -->
+                <button class="md:hidden text-gray-400" onclick="document.getElementById('sidebar').classList.remove('open')">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
             </div>
 
             <!-- Scrollable Middle Section (Tools + History) -->
-            <div class="flex-1 overflow-y-auto">
+            <div class="flex-1 overflow-y-auto min-h-0">
                 <!-- Neural Tools -->
                 <div class="p-4 space-y-3">
                     <div class="text-[10px] font-bold text-cyan-400 uppercase tracking-widest px-1">Neural Modules</div>
@@ -257,26 +276,27 @@
 
             <!-- System Status (Automated) -->
             <div class="p-4 border-t border-white/10 shrink-0 bg-black/20">
-                <div class="w-full flex items-center justify-between px-3 py-2 rounded-lg border border-white/5 bg-white/5">
+                <button onclick="checkStatusForce()" class="w-full flex items-center justify-between px-3 py-2 rounded-lg border border-white/5 bg-white/5 hover:bg-white/10 transition-colors">
                     <div class="flex items-center gap-3">
                         <div id="status-indicator" class="w-2 h-2 rounded-full bg-gray-500 transition-all duration-300"></div>
-                        <span id="status-label" class="text-xs font-mono text-gray-400 transition-colors">CHECKING...</span>
+                        <span id="status-label" class="text-xs font-mono text-gray-400 transition-colors">INITIALIZING...</span>
                     </div>
-                    <i data-lucide="activity" class="w-4 h-4 text-gray-600"></i>
-                </div>
+                    <i data-lucide="refresh-cw" class="w-4 h-4 text-gray-600"></i>
+                </button>
+                <div id="model-badge" class="text-[10px] text-center mt-2 text-gray-600 font-mono">DUAL-CORE SYSTEM</div>
             </div>
         </aside>
 
         <!-- Main Chat Area -->
-        <main class="flex-1 flex flex-col relative h-full">
+        <main class="flex-1 flex flex-col relative h-full w-full">
             
             <!-- Header (Mobile Toggle) -->
-            <header class="h-16 flex items-center justify-between px-6 border-b border-white/5 bg-transparent md:bg-opacity-0 z-20">
-                <button class="md:hidden text-gray-400 hover:text-white" onclick="document.getElementById('sidebar').classList.toggle('hidden')">
+            <header class="h-16 flex items-center justify-between px-6 border-b border-white/5 bg-transparent md:bg-opacity-0 z-20 shrink-0">
+                <button class="md:hidden text-gray-400 hover:text-white" onclick="document.getElementById('sidebar').classList.add('open')">
                     <i data-lucide="menu" class="w-6 h-6"></i>
                 </button>
                 <div class="flex items-center gap-2 ml-auto">
-                    <span class="text-xs font-mono text-cyan-400/70 border border-cyan-900/50 px-2 py-1 rounded bg-cyan-950/30">CORE: ZU-1.0</span>
+                    <span class="text-xs font-mono text-cyan-400/70 border border-cyan-900/50 px-2 py-1 rounded bg-cyan-950/30">CORE: ZU-DUAL-V2</span>
                 </div>
             </header>
 
@@ -286,7 +306,7 @@
             </div>
 
             <!-- Input Area -->
-            <div class="p-4 md:p-6 pb-8 z-20">
+            <div class="p-4 md:p-6 pb-8 z-20 shrink-0">
                 <div class="max-w-3xl mx-auto relative input-wrapper rounded-xl border border-white/10 bg-black/40 backdrop-blur-xl transition-all duration-300">
                     <form id="chat-form" class="flex items-end gap-2 p-2">
                         <!-- Hidden File Input -->
@@ -320,14 +340,21 @@
     <!-- Scripts -->
     <script>
         // --- CONFIGURATION ---
-        const apiKey = "AIzaSyC1Rong6FrP5GhexGLe1FMdqJHi7ePA-ZE"; 
+        
+        // 1. Primary Core (Default)
+        const primaryKey = "AIzaSyC1Rong6FrP5GhexGLe1FMdqJHi7ePA-ZE"; 
+        
+        // 2. Secondary Core (Auxiliary Fallback)
+        // Add your auxiliary key here if you have one.
+        const secondaryKey = ""; 
 
         // --- GLOBAL STATE ---
         let sessionId = Date.now().toString();
         let history = []; 
         let savedSessions = JSON.parse(localStorage.getItem('zu_sessions') || '{}');
         let currentToolState = 'idle'; 
-        let isOnline = false; 
+        let isOnline = true; 
+        let activeModel = "PRIMARY"; // Tracks which model last replied
 
         // --- THREE.JS BACKGROUND (Cybernetic Core) ---
         const initThreeJS = () => {
@@ -349,7 +376,7 @@
             const cyberGroup = new THREE.Group();
             scene.add(cyberGroup);
 
-            // 1. Central Wireframe Sphere (The Brain)
+            // 1. Central Wireframe Sphere
             const coreGeo = new THREE.IcosahedronGeometry(12, 2);
             const coreMat = new THREE.MeshBasicMaterial({ 
                 color: 0x00f3ff, 
@@ -371,7 +398,7 @@
             const inner = new THREE.Mesh(innerGeo, innerMat);
             cyberGroup.add(inner);
 
-            // 3. Rotating Rings (Data Streams)
+            // 3. Rotating Rings
             const ringMat = new THREE.MeshBasicMaterial({ color: 0x00f3ff, transparent: true, opacity: 0.15, side: THREE.DoubleSide });
             
             const ring1 = new THREE.Mesh(new THREE.TorusGeometry(22, 0.1, 16, 100), ringMat);
@@ -386,7 +413,7 @@
             cyberGroup.add(ring2);
             cyberGroup.add(ring3);
 
-            // 4. Orbiting Particles (Satellites)
+            // 4. Orbiting Particles
             const pGeo = new THREE.BufferGeometry();
             const pCount = 800;
             const pPos = new Float32Array(pCount * 3);
@@ -411,7 +438,6 @@
             let mouseY = 0;
             let targetX = 0;
             let targetY = 0;
-
             const windowHalfX = window.innerWidth / 2;
             const windowHalfY = window.innerHeight / 2;
 
@@ -426,36 +452,24 @@
                 targetX = mouseX * 0.5;
                 targetY = mouseY * 0.5;
 
-                // Rotate entire group based on mouse
                 cyberGroup.rotation.y += 0.002 + (targetX - cyberGroup.rotation.y) * 0.05;
                 cyberGroup.rotation.x += 0.001 + (targetY - cyberGroup.rotation.x) * 0.05;
-
-                // Specific Object Rotations
                 core.rotation.y -= 0.005;
                 core.rotation.z += 0.002;
-                
                 inner.rotation.y += 0.01;
                 inner.rotation.x += 0.01;
-                
-                // Pulse Effect
                 const time = Date.now() * 0.002;
                 inner.scale.setScalar(1 + Math.sin(time) * 0.1);
                 core.scale.setScalar(1 + Math.sin(time + 1) * 0.02);
-
-                // Ring Rotations
                 ring1.rotation.z += 0.002;
                 ring2.rotation.z -= 0.003;
                 ring3.rotation.z += 0.001;
-                
-                // Particle drift
                 particles.rotation.y = -mouseX * 0.2;
                 particles.rotation.x = -mouseY * 0.2;
-
                 renderer.render(scene, camera);
             };
 
             animate();
-
             window.addEventListener('resize', () => {
                 camera.aspect = window.innerWidth / window.innerHeight;
                 camera.updateProjectionMatrix();
@@ -538,7 +552,7 @@
             const indicator = document.getElementById('status-indicator');
             const label = document.getElementById('status-label');
             const hasNet = navigator.onLine;
-            const hasKey = apiKey && apiKey.length > 10;
+            const hasKey = (primaryKey && primaryKey.length > 10) || (secondaryKey && secondaryKey.length > 10);
 
             if (hasNet && hasKey) {
                 isOnline = true;
@@ -552,6 +566,12 @@
                 label.className = "text-xs font-mono text-red-400 transition-colors";
             }
         };
+        
+        const checkStatusForce = () => {
+            const label = document.getElementById('status-label');
+            label.innerText = "CHECKING...";
+            setTimeout(updateStatusDisplay, 500);
+        }
 
         // Listen for network changes
         window.addEventListener('online', updateStatusDisplay);
@@ -597,8 +617,7 @@
             currentToolState = 'idle';
             chatContainer.innerHTML = '';
             
-            // Welcome msg
-            const welcomeMsg = `System Online.<br>I am Zu (Core 1.0).<br>I can generate text, create images via <b>Visualizer</b>, and plan via <b>Strategist</b>.`;
+            const welcomeMsg = `System Online.<br>I am Zu (Core 1.0).<br>Running on <b>Dual-Core Architecture</b> (Primary Core + Auxiliary Fallback).`;
             chatContainer.appendChild(createMessageElement(welcomeMsg, false));
             updateHistoryUI();
         };
@@ -611,7 +630,7 @@
             
             history.forEach(msg => {
                 const isUser = msg.role === 'user';
-                const isTool = msg.role === 'tool'; // Custom flag we might use
+                const isTool = msg.role === 'tool';
                 chatContainer.appendChild(createMessageElement(msg.parts[0].text, isUser, isTool));
             });
             chatContainer.scrollTop = chatContainer.scrollHeight;
@@ -626,12 +645,13 @@
             }
         };
 
-        // --- API CALLS ---
+        // --- API CALLS (DUAL CORE) ---
 
-        const callGemini = async (prompt, systemInstruction = null) => {
-            if (!apiKey) throw new Error("API Key Missing.");
+        // 1. Primary Core (Google)
+        const callPrimaryCore = async (prompt, systemInstruction = null) => {
+            if (!primaryKey) throw new Error("Primary Key Missing");
 
-            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
+            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${primaryKey}`;
             const payload = { contents: [{ parts: [{ text: prompt }] }] };
             if (systemInstruction) payload.systemInstruction = { parts: [{ text: systemInstruction }] };
 
@@ -643,15 +663,70 @@
 
             if (!response.ok) {
                 const err = await response.json();
-                throw new Error(err.error?.message || "Gemini API Error");
+                throw new Error(`Primary Core Error: ${response.status}`);
             }
             const data = await response.json();
+            activeModel = "PRIMARY";
             return data.candidates[0].content.parts[0].text;
         };
 
-        const callImagen = async (prompt) => {
-            if (!apiKey) throw new Error("API Key Missing.");
-            const url = `https://generativelanguage.googleapis.com/v1beta/models/imagen-4.0-generate-001:predict?key=${apiKey}`;
+        // 2. Auxiliary Core (OpenAI/Other)
+        const callSecondaryCore = async (prompt, systemInstruction = null) => {
+            if (!secondaryKey) throw new Error("Auxiliary Key Missing");
+
+            const url = "https://api.openai.com/v1/chat/completions";
+            const messages = [];
+            if(systemInstruction) messages.push({ role: "system", content: systemInstruction });
+            messages.push({ role: "user", content: prompt });
+
+            const payload = {
+                model: "gpt-3.5-turbo", 
+                messages: messages,
+                max_tokens: 500
+            };
+
+            const response = await fetch(url, {
+                method: 'POST',
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${secondaryKey}`
+                },
+                body: JSON.stringify(payload)
+            });
+
+            if (!response.ok) {
+                const err = await response.json();
+                throw new Error(`Auxiliary Core Error: ${err.error?.message || response.status}`);
+            }
+            const data = await response.json();
+            activeModel = "SECONDARY";
+            return data.choices[0].message.content;
+        };
+
+        // 3. Fallback Orchestrator
+        const getFlexibleResponse = async (prompt, systemInstruction) => {
+            // Attempt 1: Primary
+            try {
+                console.log("Attempting Primary Core...");
+                return await callPrimaryCore(prompt, systemInstruction);
+            } catch (primaryError) {
+                console.warn("Primary Core Failed:", primaryError.message);
+                
+                // Attempt 2: Secondary
+                try {
+                    console.log("Switching to Auxiliary Core...");
+                    const reply = await callSecondaryCore(prompt, systemInstruction);
+                    return `${reply}\n\n<span class="text-[10px] text-orange-400 font-mono">[AUXILIARY CORE ACTIVE]</span>`;
+                } catch (secondaryError) {
+                    console.error("Auxiliary Core Failed:", secondaryError.message);
+                    throw new Error(`All Cores Failed. Primary: ${primaryError.message}. Auxiliary: ${secondaryError.message}`);
+                }
+            }
+        };
+
+        const callVisualCore = async (prompt) => {
+            if (!primaryKey) throw new Error("Primary Key Missing.");
+            const url = `https://generativelanguage.googleapis.com/v1beta/models/imagen-4.0-generate-001:predict?key=${primaryKey}`;
             const payload = { instances: [{ prompt: prompt }], parameters: { sampleCount: 1 } };
 
             const response = await fetch(url, {
@@ -660,7 +735,10 @@
                 body: JSON.stringify(payload)
             });
 
-            if (!response.ok) throw new Error("Imagen API Error");
+            if (!response.ok) {
+                 const err = await response.json();
+                 throw new Error(err.error?.message || `Visual Core Error: ${response.status}`);
+            }
             const data = await response.json();
             return `![Generated Image](data:image/png;base64,${data.predictions[0].bytesBase64Encoded})`;
         };
@@ -671,25 +749,25 @@
             // Check Status
             if (!isOnline) {
                 return new Promise(resolve => setTimeout(() => {
-                    resolve("<b>[OFFLINE MODE]</b><br>Neural Core disconnected. Unable to process request.<br>Please check your internet connection.");
+                    resolve("<b>[OFFLINE ERROR]</b><br>Core disconnected. Unable to process request.<br>Please check network connection and API key validity.");
                 }, 800));
             }
 
-            // Interactive Tool Mode
             let reply = "";
             let prompt = "";
             let sysInst = "";
 
             if (currentToolState === 'visualizer_prompt') {
-                reply = await callImagen(text);
+                reply = await callVisualCore(text);
                 currentToolState = 'idle'; // Reset
                 return reply;
             } 
             
+            // For text-based tools, we use the Dual-Core logic
             if (currentToolState === 'strategist_prompt') {
                 sysInst = "You are a Strategic Advisor. Create a markdown table with columns: 'Step', 'Action', 'Risk'.";
                 prompt = `Create execution plan for: ${text}`;
-                reply = await callGemini(prompt, sysInst);
+                reply = await getFlexibleResponse(prompt, sysInst);
                 currentToolState = 'idle';
                 return reply;
             }
@@ -697,7 +775,7 @@
             if (currentToolState === 'code_weaver_prompt') {
                 sysInst = "You are an expert Senior Software Engineer. Provide a robust, clean, and well-commented code solution in the requested language. Use Markdown code blocks.";
                 prompt = `Generate code for: ${text}`;
-                reply = await callGemini(prompt, sysInst);
+                reply = await getFlexibleResponse(prompt, sysInst);
                 currentToolState = 'idle';
                 return reply;
             }
@@ -705,7 +783,7 @@
             if (currentToolState === 'mind_reader_prompt') {
                 sysInst = "You are an expert in psychology and sentiment analysis. Analyze the following text for: 1. Emotional Tone 2. Subtext/Hidden Meaning 3. Psychological State of the author. Be concise but deep.";
                 prompt = `Analyze this text: "${text}"`;
-                reply = await callGemini(prompt, sysInst);
+                reply = await getFlexibleResponse(prompt, sysInst);
                 currentToolState = 'idle';
                 return reply;
             }
@@ -714,7 +792,13 @@
             history.push({ role: "user", parts: [{ text: text }] });
             const contextPayload = history.slice(-10);
             const historyText = contextPayload.map(m => `${m.role==='user'?'User':'Zu'}: ${m.parts[0].text}`).join('\n');
-            return await callGemini(`${historyText}\nZu:`, "You are Zu, a 3D interface AI. Helpful, futuristic, concise.");
+            
+            // Using Dual-Core for normal chat
+            reply = await getFlexibleResponse(
+                `${historyText}\nZu:`, 
+                "You are Zu, a high-tech 3D interface AI. You are helpful, precise, futuristic, and slightly mysterious. Be concise."
+            );
+            return reply;
         };
 
         const triggerTool = (type) => {
@@ -739,7 +823,6 @@
             chatContainer.appendChild(toolMsg);
             chatContainer.scrollTop = chatContainer.scrollHeight;
             
-            // Add tool prompt to history so it flows naturally
             history.push({ role: "model", parts: [{ text: msg }] });
         };
 
@@ -752,8 +835,6 @@
             reader.onload = (event) => {
                 const text = event.target.result;
                 const snippet = `[Uploaded File: ${file.name}]\n${text}\n[End File]`;
-                
-                // Add to history context invisibly or visibly? Let's make it visible but collapsed logic
                 chatContainer.appendChild(createMessageElement(`<i>File '${file.name}' ingested into neural buffer.</i>`, false));
                 history.push({ role: "user", parts: [{ text: snippet }] });
                 saveCurrentSession();
@@ -779,12 +860,10 @@
             chatContainer.scrollTop = chatContainer.scrollHeight;
 
             try {
-                // 3. Logic (Tool or Chat)
+                // 3. Logic
                 const responseText = await handleToolLogic(text);
                 
                 // 4. Save Response
-                // Only push model response if it's not offline error message (unless we want to record errors)
-                // We'll push it to keep history consistent visually
                 history.push({ role: "model", parts: [{ text: responseText }] });
                 
                 loader.remove();
@@ -794,7 +873,7 @@
 
             } catch (error) {
                 loader.remove();
-                chatContainer.appendChild(createMessageElement(`**Error:** ${error.message}`));
+                chatContainer.appendChild(createMessageElement(`**System Error:** ${error.message}`));
             }
         });
 
@@ -811,8 +890,8 @@
         document.head.appendChild(styleSheet);
 
         initThreeJS();
-        updateStatusDisplay(); // Check status immediately
-        startNewChat(); // Initialize first session
+        updateStatusDisplay();
+        startNewChat(); 
 
     </script>
 </body>
