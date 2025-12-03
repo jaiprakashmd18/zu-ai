@@ -344,7 +344,7 @@
                     </button>
                 </div>
                 <div class="text-center mt-2 flex justify-center gap-4">
-                    <p class="text-[10px] text-gray-600 font-mono">ZU V2.5 // SYSTEM OPTIMAL</p>
+                    <p class="text-[10px] text-gray-600 font-mono">ZU V1.0 // SYSTEM OPTIMAL</p>
                 </div>
             </div>
 
@@ -368,9 +368,9 @@
                 <!-- API Key Section -->
                 <div>
                     <label class="text-xs font-mono text-zu-accent uppercase mb-2 block flex items-center gap-2">
-                        <i data-lucide="key" class="w-3 h-3"></i> Neural Link (Gemini API Key)
+                        <i data-lucide="key" class="w-3 h-3"></i> Neural Link (Zu API Key)
                     </label>
-                    <p class="text-xs text-gray-500 mb-3">Connect Zu to Google's Gemini models. Key is stored locally in your browser.</p>
+                    <p class="text-xs text-gray-500 mb-3">Connect Zu. Key is stored locally in your browser.</p>
                     <div class="relative">
                         <input type="password" id="api-key-input" placeholder="AIza..." class="w-full bg-black/30 border border-white/10 rounded-lg p-3 text-white focus:border-zu-accent focus:outline-none font-mono text-sm">
                         <button id="save-key-btn" class="absolute right-2 top-2 px-3 py-1 bg-zu-accent/10 hover:bg-zu-accent text-zu-accent hover:text-black rounded text-xs font-bold transition-all">CONNECT</button>
@@ -610,7 +610,7 @@
                 const text = ui.connectionStatus.querySelector('span');
                 
                 indicator.className = 'w-2 h-2 bg-green-500 rounded-full shadow-[0_0_8px_rgba(34,197,94,0.8)] animate-pulse';
-                text.textContent = 'GEMINI LINK: ACTIVE';
+                text.textContent = 'Zu LINK: ACTIVE';
                 text.classList.add('text-green-500', 'font-bold');
                 
                 ui.apiStatusText.textContent = `Online: ${storedModel}`;
@@ -658,7 +658,7 @@
             if (val.length > 20) {
                 storedApiKey = val;
                 localStorage.setItem('zu_gemini_key', val);
-                msg.textContent = 'Authentication Successful. Gemini Core Synced.';
+                msg.textContent = 'Authentication Successful. Zu Core Synced.';
                 msg.className = 'text-xs mt-2 h-4 text-green-400 font-mono';
                 updateConnectionStatus();
                 setTimeout(() => {
@@ -666,7 +666,7 @@
                     msg.textContent = '';
                 }, 1000);
             } else {
-                msg.textContent = 'Invalid Key Format. Please check your Gemini API key.';
+                msg.textContent = 'Invalid Key Format. Please check your Zu API key.';
                 msg.className = 'text-xs mt-2 h-4 text-red-400 font-mono';
             }
         });
@@ -738,7 +738,7 @@
 
                 } catch (error) {
                     console.error("API Error:", error);
-                    return `**SYSTEM ERROR:** Connection to Gemini cloud failed.\n\n\`${error.message}\`\n\n**Tip:** Go to Settings -> AI Model Core and try switching to a different model (e.g., gemini-1.5-flash or gemini-pro).`;
+                    return `**SYSTEM ERROR:** Connection to Zu cloud failed.\n\n\`${error.message}\`\n\n**Tip:** Go to Settings -> AI Model Core and try switching to a different model (e.g.,Zu-1.5-flash or Zu-pro).`;
                 }
             }
 
@@ -746,8 +746,8 @@
             return new Promise(resolve => {
                 setTimeout(() => {
                     const lower = userMessage.toLowerCase();
-                    if (mode) resolve(`**[SIMULATION: ${mode}]**\n\nThis is a simulated ${mode} response. To unlock real AI intelligence, please connect your Gemini API key.`);
-                    else if (lower.includes('hello')) resolve("System Online. Greetings, User. I am **Zu v2.5**. My local processing nodes are active. Connect a Neural Link (Gemini API Key) for full cognitive capacity.");
+                    if (mode) resolve(`**[SIMULATION: ${mode}]**\n\nThis is a simulated ${mode} response. To unlock real AI intelligence, please connect your Zu API key.`);
+                    else if (lower.includes('hello')) resolve("System Online. Greetings, User. I am **Zu v1.5**. My local processing nodes are active. Connect a Neural Link (Zu API Key) for full cognitive capacity.");
                     else resolve(`**Input Received:** "${userMessage}"\n\nI am currently running in **Simulation Mode**. To unlock my full potential (including complex reasoning, code generation, and world knowledge), please enter your Google Gemini API Key in the **Settings** menu.`);
                 }, 1000);
             });
@@ -784,7 +784,7 @@
             ui.messagesList.innerHTML = '';
             ui.messagesList.classList.add('hidden');
             ui.emptyState.classList.remove('hidden');
-            ui.chatTitle.textContent = "NEW SESSION // V2.5";
+            ui.chatTitle.textContent = "NEW SESSION // V1.0";
             ui.userInput.value = '';
             
             // Reset Modes
@@ -834,7 +834,7 @@
                     </div>
                     
                     <div class="flex flex-col ${isUser ? 'items-end' : 'items-start'} w-full min-w-0">
-                        <span class="text-[10px] font-mono text-gray-500 mb-1 tracking-wider">${isUser ? 'USER_ID_01' : 'ZU_CORE_V2.5'}</span>
+                        <span class="text-[10px] font-mono text-gray-500 mb-1 tracking-wider">${isUser ? 'USER_ID_01' : 'ZU_CORE_V1.0'}</span>
                         <div class="px-5 py-3 rounded-2xl text-base leading-relaxed ${
                             isUser 
                             ? 'chat-bubble-user text-gray-100 rounded-tr-sm font-body' 
@@ -1045,3 +1045,4 @@
     </script>
 </body>
 </html>
+
