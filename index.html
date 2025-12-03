@@ -252,10 +252,10 @@
             <div class="p-4 border-t border-zu-border bg-black/20">
                 <button id="settings-btn" class="flex items-center gap-3 w-full hover:bg-white/5 p-2 rounded-lg transition-colors group">
                     <div class="w-8 h-8 rounded-full bg-gradient-to-tr from-zu-secondary to-zu-accent flex items-center justify-center shadow-[0_0_10px_rgba(0,243,255,0.3)]">
-                        <span class="font-bold text-xs text-black">U</span>
+                        <span class="font-bold text-xs text-black">Zu</span>
                     </div>
                     <div class="text-left flex-1">
-                        <p class="text-sm font-bold text-white group-hover:text-zu-accent transition-colors">System Admin</p>
+                        <p class="text-sm font-bold text-white group-hover:text-zu-accent transition-colors">Access</p>
                         <p id="api-status-text" class="text-[10px] text-gray-500">Local Mode</p>
                     </div>
                     <i data-lucide="settings" class="w-4 h-4 text-gray-400 group-hover:rotate-45 transition-transform"></i>
@@ -272,7 +272,7 @@
                     <button id="toggle-sidebar" class="text-gray-300 hover:text-white transition-colors">
                         <i data-lucide="panel-left" class="w-6 h-6"></i>
                     </button>
-                    <span id="current-chat-title" class="font-display text-sm md:text-base text-gray-300 tracking-wider opacity-80">NEW SESSION // V2.5</span>
+                    <span id="current-chat-title" class="font-display text-sm md:text-base text-gray-300 tracking-wider opacity-80">NEW SESSION // V1.0</span>
                 </div>
                 <div class="flex items-center gap-4">
                     <div id="connection-status" class="hidden md:flex items-center gap-2 px-3 py-1 rounded-full bg-zu-accent/5 border border-zu-accent/20 transition-all duration-300">
@@ -516,7 +516,7 @@
         // -----------------------------------------------------------------------------
         let chats = JSON.parse(localStorage.getItem('zu_chats')) || [];
         let storedApiKey = localStorage.getItem('zu_gemini_key') || null;
-        let storedModel = localStorage.getItem('zu_model') || 'gemini-2.5-flash-preview-09-2025';
+        let storedModel = localStorage.getItem('zu_model') || 'Zu Activated';
         let voiceEnabled = localStorage.getItem('zu_voice_enabled') === 'true';
         let currentChatId = null;
         let isGenerating = false;
@@ -1045,4 +1045,5 @@
     </script>
 </body>
 </html>
+
 
